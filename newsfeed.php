@@ -52,11 +52,7 @@ if(file_exists(THEME."templates/newsfeed/newsfeed_template.php"))
 {
 	include(THEME."templates/newsfeed/newsfeed_template.php");
 }
-elseif (file_exists(THEME."newsfeed_template.php"))
-{
-	include(THEME."newsfeed_template.php");
-}
-else if(!varset($NEWSFEED_LIST_START, FALSE))
+elseif(!varset($NEWSFEED_LIST_MODE, FALSE))
 {
 	include(e_PLUGIN."newsfeed/templates/newsfeed_template.php");
 }
@@ -75,16 +71,24 @@ if(!empty($_GET['id'])) //v2.x
 	$action = 'show';
 }
 
+$breadarray[] =  
+	array('text' =>  NFLAN_29 , 'url' => e107::url('newsfeed', 'index'));
+
 if($action == "show")
 {
 	/* 'show' action - show feed */
 
 	$data = $newsFeed->newsfeedInfo($id == 0 ? 'all' : $id, 'main');
-	$ns->tablerender($data['title'], $data['text']);
+
+	$breadarray[] = array('text' =>  $data['title'], '');
+	e107::breadcrumb($breadarray);
+
+	$ns->tablerender($data['title'], $data['text'], $NEWSFEED_SHOW_MODE);
+
 	require_once(FOOTERF);
 	exit;
 }
-
+e107::breadcrumb($breadarray);
 	
 /* no action - display feed list ... */
 $newsFeed->readFeedList();
@@ -110,6 +114,6 @@ if (count($newsFeed->feedList))
 }
 
 $text = $NEWSFEED_LIST_START . vartrue($data) . $NEWSFEED_LIST_END;
-$ns->tablerender(NFLAN_29, $text);
+$ns->tablerender(NFLAN_29, $text,  $NEWSFEED_LIST_MODE);
 require_once(FOOTERF);
 

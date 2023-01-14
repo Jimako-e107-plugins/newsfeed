@@ -274,8 +274,8 @@ class newsfeedClass
 		$tp = e107::getParser();
 
 		global $NEWSFEED_MAIN_START, $NEWSFEED_MAIN, $NEWSFEED_MAIN_END;
-		global $NEWSFEED_MENU_START, $NEWSFEED_MENU, $NEWSFEED_MENU_END;
-
+		global $NEWSFEED_MAIN_CAPTION;
+ 
 		if($which == 'all')
 		{
 			$filter = 0;
@@ -294,20 +294,16 @@ class newsfeedClass
 		{
 			include(THEME."templates/newsfeed/newsfeed_menu_template.php");
 		}
-		elseif(file_exists(THEME."newsfeed_menu_template.php")) //v1.x
-		{
-			include(THEME."newsfeed_menu_template.php");
-		}
 		else
 		{
 			include(e_PLUGIN."newsfeed/templates/newsfeed_menu_template.php");
 		}
 
 		$vars = array();
-
+ 
 		foreach($this->feedList as $nfID => $feed)
 		{
-
+			
 			$feed['newsfeed_sef'] = eHelper::title2sef($feed['newsfeed_name'], 'dashl');
 
 			if (($filter == 0) || ($filter == $feed['newsfeed_id']))
@@ -315,6 +311,9 @@ class newsfeedClass
 				if (($rss = $this->getFeed($nfID)))	// Call ensures that feed is updated if necessary
 				{
 					list($newsfeed_image, $newsfeed_showmenu, $newsfeed_showmain) = explode("::", $feed['newsfeed_image']);
+
+
+					$newsfeed_name = $feed['newsfeed_name'];
 					
 					$numtoshow = intval($where == 'main' ? $newsfeed_showmain : $newsfeed_showmenu);
 					$numtoshow = ($numtoshow > 0 ? $numtoshow : 999);
@@ -326,7 +325,7 @@ class newsfeedClass
 					$vars['FEEDDESCRIPTION'] = $feed['newsfeed_description'];
 					$vars['FEEDIMAGE'] = $rss['newsfeed_image_link'];
 					$vars['FEEDLANGUAGE'] = $rss['channel']['language'];
-					
+ 
 					if($rss['channel']['lastbuilddate'])
 					{
 						$pubbed = $rss['channel']['lastbuilddate'];
@@ -349,7 +348,7 @@ class newsfeedClass
 					$vars['FEEDCOPYRIGHT']      = $tp -> toHTML(vartrue($rss['channel']['copyright']), FALSE);
 					$vars['FEEDTITLE']          = "<a href='".$rss['channel']['link']."' rel='external'>".vartrue($rss['channel']['title'])."</a>";
 					$vars['FEEDLINK']           = $rss['channel']['link'] ;
-
+                    $vars['FEEDBACKLINK']       = "<a href='".e107::url('newsfeed', 'index')."'>".NFLAN_31 ."</a>" ;
 
 					if($feed['newsfeed_active'] == 2 or $feed['newsfeed_active'] == 3)
 					{
@@ -361,7 +360,7 @@ class newsfeedClass
 					}
 	
 					$data = "";
-	
+
 					$numtoshow = min($numtoshow, count($rss['items']));
 					$i = 0;
 					while($i < $numtoshow)
@@ -374,7 +373,7 @@ class newsfeedClass
 						$vars['FEEDITEMLINK']       = str_replace('&', '&amp;', $vars['FEEDITEMLINK']);
 						$feeditemtext               = preg_replace("#\[[a-z0-9=]+\]|\[\/[a-z]+\]|\{[A-Z_]+\}#si", "", strip_tags($item['description']));
 						$vars['FEEDITEMCREATOR']    = $tp -> toHTML(vartrue($item['author']), FALSE);
-						
+					 
 						if ($where == 'main')
 						{
 							if(!empty($NEWSFEED_COLLAPSE))
@@ -400,19 +399,21 @@ class newsfeedClass
 						{
 							if ($this->truncateCount)
 							{
-								$vars['FEEDITEMTEXT'] = $tp->text_truncate($feeditemtext, $this->truncateCount, $this->truncateMore);
+								$vars['FEEDITEMTEXT'] = $tp->truncate($feeditemtext, $this->truncateCount, $this->truncateMore);
 							}
 							else
 							{
 								$vars['FEEDITEMTEXT'] = '';			// Might just want title
 							}
 							$data .= $tp->simpleParse($NEWSFEED_MENU, $vars);
+								
 						}
 						$i++;
 					}
 				}
+				 
 			}
-
+			 
 			if ($where == 'main')
 			{
 				$vars['BACKLINK'] = "<a href='".e_SELF."'>".NFLAN_31."</a>";
@@ -425,17 +426,17 @@ class newsfeedClass
 
 			//TODO Move the $vars into their own shortcode class and change simpleParse to parseTemplate();
 		}
-
+ 
 		if($which == 'all')
 		{
 			$ret['title'] = (!empty($NEWSFEED_MENU_CAPTION)) ? $NEWSFEED_MENU_CAPTION : '';
 		}
 		else
 		{
-			$ret['title'] = $feed['newsfeed_name']." ".varset($NEWSFEED_MAIN_CAPTION);
+			$ret['title'] = $newsfeed_name ." ".varset($NEWSFEED_MAIN_CAPTION);
 		}
 		$ret['text'] = $text;
-
+ 
 		return $ret;
 	}
 }

@@ -17,7 +17,11 @@
 
 if (!defined('e107_INIT')) { exit; }
 
-$NEWSFEED_MAIN_CAPTION = NFLAN_38;
+
+$NEWSFEED_LIST_MODE = "default";
+$NEWSFEED_SHOW_MODE = "default";
+
+$NEWSFEED_MAIN_CAPTION = NFLAN_38; 
 
 $NEWSFEED_LIST_START = "
 <table style='width: 100%;' class='newsfeed-list table fborder'>\n";
@@ -54,7 +58,7 @@ $NEWSFEED_MAIN_END = "
 </tr>
 
 <tr>
-<td class='forumheader3' style='text-align: center;'><span class='smalltext'>{BACKLINK}</span></td>
+<td class='forumheader3' style='text-align: center;'><span class='smalltext'>{FEEDBACKLINK}</span></td>
 </tr>
 </table>\n";
 
